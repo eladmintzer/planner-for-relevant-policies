@@ -6,6 +6,7 @@ import fractions
 from . import conditions
 from . import effects
 from . import pddl_types
+from functools import reduce
 
 class Action(object):
     def __init__(self, name, parameters, num_external_parameters,
@@ -139,7 +140,7 @@ class Action(object):
         if self.cost is None:
             cost = 0
             isInferredCost = False
-        elif isinstance(self.cost, (int, long)):
+        elif isinstance(self.cost, (int, float)):
             cost = self.cost
             isInferredCost = True
         else:

@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
 import re, pprint
+import sys
+
+input_file_name = sys.argv[1]
+output_policy_name = input_file_name.replace(".out",".json")
+output_map_name = input_file_name.replace(".out",".sat_mapper")
 
 def read_file(file_name):
     """Return a list of the lines of a file."""
@@ -89,23 +94,37 @@ for i in range(num_vars):
     for j in range(len(vals)):
         mapping["%s:%s" % (name, j)] = vals[j]
 
-print "Mapping:\n"
-print '\n'.join(["  %s\t<-> \t %s" % (k,mapping[k]) for k in sorted(mapping.keys())])
-print
+# print "Mapping:\n"
+# print '\n'.join(["  %s\t<-> \t %s" % (k,mapping[k]) for k in sorted(mapping.keys())])
+# print
 
 def translate_lines(lines):
+    di = dict()
+    key = "Nand"
     for line in lines:
         if 'If' == line[:2]:
-            print "If holds: %s" % '/'.join([mapping[item] for item in line.split(' ')[2:]])
-        else:
-            print line
+            my_list = [mapping[item] for item in line.split(' ')[2:]]
+            # print "If holds: %s" % '/'.join(my_list)
+            key = '&'.join(my_list)
 
-print "Policy:"
-policy_lines = read_file('policy.out')
-translate_lines(policy_lines)
-print
+        elif "Execute" in line:
+            # print line
+            my_line = line.replace("Execute: ","").split(" /")[0]
+            my_line = "({})".format(my_line)
+            d = line.split("/ d=")[-1]
+            # TODO: replace when needed:
+            #d[key] = my_line
+            di[my_line] = [key,int(d)]
 
-print "FSAP:"
-fsap_lines = read_file('policy.fsap')
-translate_lines(fsap_lines)
-print
+    return di
+
+policy_lines = read_file(input_file_name)
+di = translate_lines(policy_lines)
+
+import json
+print "process policy file to "+ output_policy_name
+with open(output_policy_name, 'w') as pp:
+    json.dump(di, pp)
+print "process mapper file to "+ output_map_name
+with open(output_map_name, 'w') as mp:
+    json.dump(mapping, mp)

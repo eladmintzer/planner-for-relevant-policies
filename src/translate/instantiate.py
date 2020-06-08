@@ -47,7 +47,7 @@ def instantiate(task, model):
     isAllCostsInferred = True # Assume all are inferred until we find one that isn't
     for atom in model:
         if isinstance(atom.predicate, pddl.Action):
-            if (atom.predicate.cost and not isinstance(atom.predicate.cost, (int, long))):
+            if (atom.predicate.cost and not isinstance(atom.predicate.cost, (int, float))):
                 isAllCostsInferred = False  # A real cost has been found
                 break
 
