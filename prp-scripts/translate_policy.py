@@ -100,26 +100,35 @@ for i in range(num_vars):
 
 def translate_lines(lines):
     di = dict()
+    d2 = []
     key = "Nand"
+    last_d = 0
+    my_list=[]
+
     for line in lines:
         if 'If' == line[:2]:
             my_list = [mapping[item] for item in line.split(' ')[2:]]
             # print "If holds: %s" % '/'.join(my_list)
-            key = '&'.join(my_list)
+            key = ' & '.join(my_list)
 
         elif "Execute" in line:
             # print line
             my_line = line.replace("Execute: ","").split(" /")[0]
-            my_line = "({})".format(my_line)
-            d = line.split("/ d=")[-1]
+            my_line_st = "({})".format(my_line)
+            d = int(line.split("/ d=")[-1]) * 10
+            if d <= last_d:
+                d = last_d + 1  
             # TODO: replace when needed:
             #d[key] = my_line
-            di[my_line] = [key,int(d)]
+            #di[my_line_st] = [key,d]
+            di[my_line_st] = [my_list,d]
+            d2.append((key.replace("&","and"), my_line_st,d))
+            last_d = d
 
-    return di
+    return di,d2
 
 policy_lines = read_file(input_file_name)
-di = translate_lines(policy_lines)
+di,d2 = translate_lines(policy_lines)
 
 import json
 print "process policy file to "+ output_policy_name
@@ -128,3 +137,16 @@ with open(output_policy_name, 'w') as pp:
 print "process mapper file to "+ output_map_name
 with open(output_map_name, 'w') as mp:
     json.dump(mapping, mp)
+
+ 
+# DEBUG
+debug_output_policy_name = output_policy_name.replace(".json","_code.py")
+d2.sort(key=lambda tup: -tup[2])
+
+print "process debug policy file to "+ debug_output_policy_name
+with open(debug_output_policy_name, 'w') as dp:
+    for state, action,d in d2:
+        dp.write("if({}):\n\treturn {} #{}\n".format(state, action,d))
+    json.dump(d2, dp)
+
+ 
