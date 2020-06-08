@@ -235,7 +235,26 @@ def parse_task(task_pddl):
     initial.extend(initial_true)
     yield initial
 
-    goal = next(iterator)
+    
+
+    ######### The reveal part
+    gl = next(iterator)
+    if gl[0] != ":reveal":
+        goal = gl
+    else:
+        reveal_true = set()
+
+        for fact in gl[1:]:
+            print (fact)
+            atom = conditions.Atom(fact[1][0], fact[1][1:])
+            print (atom)
+
+            check_atom_consistency(atom, reveal_true, initial_false)
+            reveal_true.add(atom)
+        initial.extend(reveal_true)
+        goal = next(iterator)
+    ######### End of the reveal part ##########
+
     assert goal[0] == ":goal" and len(goal) == 2
     yield conditions.parse_condition(goal[1])
 
