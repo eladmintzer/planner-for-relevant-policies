@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# This file was edit by
+# Elad Mintzer 203768460
+
 import re, pprint
 import sys
 
@@ -140,13 +143,13 @@ with open(output_map_name, 'w') as mp:
 
  
 # DEBUG
-debug_output_policy_name = output_policy_name.replace(".json","_code.py")
-d2.sort(key=lambda tup: -tup[2])
+# debug_output_policy_name = output_policy_name.replace(".json","_code.py")
+# d2.sort(key=lambda tup: -tup[2])
 
-print "process debug policy file to "+ debug_output_policy_name
-with open(debug_output_policy_name, 'w') as dp:
-    for state, action,d in d2:
-        dp.write("if({}):\n\treturn {} #{}\n".format(state, action,d))
-    json.dump(d2, dp)
+# print "process debug policy file to "+ debug_output_policy_name
+# with open(debug_output_policy_name, 'w') as dp:
+#     for state, action,d in d2:
+#         dp.write("if({}):\n\treturn {} #{}\n".format(state, action,d))
+#     json.dump(d2, dp)
 
  
