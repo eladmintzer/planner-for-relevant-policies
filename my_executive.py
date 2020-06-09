@@ -191,7 +191,7 @@ def main():
                os.path.abspath(problem_file),
                 "--dump-policy",
                  "2"]
-        call1.extend(["--trials","20","--forgetpolicy","0"])
+        call1.extend(["--trials","100","--forgetpolicy","0"])
 
         print "run: " + " ".join(call1)
         subprocess.call(call1)
