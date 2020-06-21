@@ -1,0 +1,9 @@
+# Elad Mintzer ID:203768460
+## my_executive.py
+The main agent, run the simulator with the matched mode (Executer/Learner)
+based on the mode flag (-L/-E)
+
+#Build:
+cd src/
+./build_all
+

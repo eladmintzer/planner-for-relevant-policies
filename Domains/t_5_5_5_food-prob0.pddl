@@ -66,7 +66,7 @@
 	(north d0 c3)
     (person person1)
 	(food food1)
-    (at person1 g0)
+    (at person1 c00)
 )
 (:reveal ((at person1 g4) (at food1 g4) 1))
 (:goal 
