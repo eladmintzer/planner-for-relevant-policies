@@ -10,6 +10,8 @@ import itertools
 from pddlsim.executors.executor import Executor
 from pddlsim.local_simulator import LocalSimulator
 
+FNULL = open(os.devnull, 'w')
+
 class MYPlanner(Executor):
     def __init__(self,policy_file_name):
         super(MYPlanner, self).__init__()
@@ -171,6 +173,26 @@ class MYPlanner(Executor):
     def action_str_to_tuple(self, str_action):
         return tuple(str_action[1:-1].split())
 
+def RunLearningPhase(domain_file,problem_file, human_policy_out):
+
+    call1 = ["src/prp",
+             os.path.abspath(domain_file),
+             os.path.abspath(problem_file),
+             "--dump-policy",
+             "2"]
+    call1.extend(["--trials", "100", "--forgetpolicy", "0"])
+
+    # print "run: " + " ".join(call1)
+    subprocess.call(call1, stdout=FNULL, stderr=subprocess.STDOUT)
+    call2 = ["mv", "policy.out", human_policy_out]
+    # print "run: " + " ".join(call2)
+    subprocess.call(call2, stdout=FNULL, stderr=subprocess.STDOUT)
+    call3 = ["python2.7", "prp-scripts/translate_policy.py",
+             os.path.abspath(human_policy_out)]
+    # print "run: " + " ".join(call3)
+    subprocess.call(call3, stdout=FNULL, stderr=subprocess.STDOUT)
+    print(("Finish learn the policy"))
+
 # Define the main function
 def main():
     mode = sys.argv[1]
@@ -185,29 +207,14 @@ def main():
     human_policy_json = final_policy_file + ".json"
 
     if mode == "-L":
+        print("Learning Mode!!")
+        RunLearningPhase(domain_file,problem_file, human_policy_out)
 
-        call1 = ["src/prp",
-               os.path.abspath(domain_file),
-               os.path.abspath(problem_file),
-                "--dump-policy",
-                 "2"]
-        call1.extend(["--trials","100","--forgetpolicy","0"])
-
-        print "run: " + " ".join(call1)
-        subprocess.call(call1)
-        call2=["mv",  "policy.out",  human_policy_out]
-        print "run: " + " ".join(call2)
-        subprocess.call(call2)
-        call3 = ["python2.7","prp-scripts/translate_policy.py",
-                 os.path.abspath(human_policy_out)]
-        print "run: " + " ".join(call3)
-        subprocess.call(call3)
-        print("Finish training..")
     elif mode == "-E":
-        print("Execute Mode mode")
+        print("Execute Mode!!")
         if not os.path.exists(human_policy_json):
-            print "missing ploicy file, first run -L"
-            exit(-1)
+            print "Missing policy file, learn the plan's online!!"
+            RunLearningPhase(domain_file,problem_file, human_policy_out)
         print LocalSimulator().run(domain_file, problem_file, MYPlanner(human_policy_json))
     else:
         print("Invalid mode")
